@@ -37,6 +37,8 @@ export default function App() {
     requestPermission();
   };
 
+  const imageRef = useRef();
+
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
@@ -65,7 +67,22 @@ export default function App() {
   }
 
   const onImageSaveAsync = async() => {
+    try {
+      const localUri = await captureRef(imageRef, {
+        height: 400,
+        quality: 1,
+      });
 
+      // save the picture to gallery
+      await MediaLibrary.saveToLibraryAsync(localUri);
+
+      if(localUri) {
+        alert("Image Saved!")
+      }
+      
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   // modal on close
@@ -77,8 +94,10 @@ export default function App() {
     <SafeAreaProvider>
       <GestureHandlerRootView className="flex-1 flex-col items-center justify-center bg-slate-950">
         <View className="image-container flex-1 pt-[58px]">
-          <ImageViewer placeholderImageSource={ placeholderImage } selectedImage={ selectedImage } />
-          { pickedEmoji && <EmojiSticker imageSize={40} stickerSource={ pickedEmoji } /> }
+          <View ref={ imageRef } collapsable={ false }>
+            <ImageViewer placeholderImageSource={ placeholderImage } selectedImage={ selectedImage } />
+            { pickedEmoji && <EmojiSticker imageSize={40} stickerSource={ pickedEmoji } /> }
+          </View>
         </View>
 
         { showAppOptions ? (
