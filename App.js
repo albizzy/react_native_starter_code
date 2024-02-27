@@ -1,9 +1,11 @@
-import { useState }  from 'react';
+import { useState, useRef }  from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { View, Text, Image } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as ImagePicker from 'expo-image-picker';
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import * as MediaLibrary from 'expo-media-library';
+import { captureRef } from 'react-native-view-shot';
 
 // components
 import ImageViewer from './components/ImageViewer';
@@ -26,6 +28,14 @@ export default function App() {
   const [isModalVisible, setIsModalVisible] = useState(false);
   // emoji state
   const [pickedEmoji, setPickedEmoji] = useState(null);
+
+  // media access permission
+  const [status, requestPermission] = MediaLibrary.usePermissions();
+
+  // request media access permission
+  if ( status === null ) {
+    requestPermission();
+  };
 
   const pickImageAsync = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
